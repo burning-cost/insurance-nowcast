@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "insurance-nowcast"
+version = "0.1.0"
+description = "ML-Enhanced EM Nowcasting for insurance claims reporting delays"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Burning Cost", email = "pricing.frontier@gmail.com" },
+]
+keywords = [
+    "insurance",
+    "pricing",
+    "actuarial",
+    "nowcasting",
+    "ibnr",
+    "claims",
+    "em-algorithm",
+    "xgboost",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Office/Business :: Financial",
+]
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scikit-learn>=1.3",
+    "xgboost>=2.0",
+    "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+plots = ["matplotlib>=3.7"]
+lightgbm = ["lightgbm>=4.0"]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.0",
+    "matplotlib>=3.7",
+]
+
+[project.urls]
+Homepage = "https://github.com/burning-cost/insurance-nowcast"
+Repository = "https://github.com/burning-cost/insurance-nowcast"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/insurance_nowcast"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"
