@@ -10,9 +10,12 @@ from insurance_nowcast._validators import validate_fit_inputs, validate_feature_
 
 def _make_valid_df(n=50):
     rng = np.random.default_rng(0)
+    # Ensure report_period >= occurrence_period by construction
+    occ = rng.integers(0, 5, n)
+    delay = rng.integers(0, 4, n)
     return pd.DataFrame({
-        "occurrence_period": rng.integers(0, 5, n),
-        "report_period": (rng.integers(0, 5, n) + rng.integers(0, 3, n)).astype(float),
+        "occurrence_period": occ,
+        "report_period": (occ + delay).astype(float),
         "exposure": rng.uniform(0.5, 2.0, n),
         "feature_a": rng.uniform(0, 1, n),
         "feature_b": rng.integers(0, 3, n).astype(float),
@@ -71,8 +74,8 @@ class TestValidateFitInputs:
     def test_report_before_occurrence_raises(self):
         df = _make_valid_df()
         # Set report_period to be less than occurrence_period
-        df.loc[0, "report_period"] = -100.0
-        df.loc[0, "occurrence_period"] = 5
+        df.loc[0, "occurrence_period"] = 10
+        df.loc[0, "report_period"] = 0.0  # definitely before occurrence
         with pytest.raises(ValueError, match="report_period < occurrence_period"):
             self._call(df)
 
@@ -115,9 +118,12 @@ class TestValidateFitInputs:
         """Should warn when >10% of observed delays are at boundary."""
         rng = np.random.default_rng(0)
         n = 100
+        # occurrence periods 0, 1 to satisfy >= 2 periods requirement
+        occ = np.array([0] * 50 + [1] * 50)
+        # All claims have delay == 12 (at boundary)
         df = pd.DataFrame({
-            "occurrence_period": [0] * n,
-            "report_period": [12.0] * n,  # all at boundary = 100%
+            "occurrence_period": occ,
+            "report_period": (occ + 12).astype(float),
             "exposure": [1.0] * n,
             "feature_a": rng.uniform(0, 1, n),
             "feature_b": [0.0] * n,

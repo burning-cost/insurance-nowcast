@@ -60,4 +60,4 @@ packages = ["src/insurance_nowcast"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v"
+addopts = "-v -p no:cacheprovider"

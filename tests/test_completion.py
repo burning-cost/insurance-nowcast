@@ -16,9 +16,16 @@ from insurance_nowcast._mstep import MultinomialGLMDelay, XGBoostDelay
 def _make_test_data(n_periods=5, max_delay=6):
     rng = np.random.default_rng(42)
     occurrence_periods = np.arange(n_periods)
-    # Truncation: older periods more observed
-    truncation_depth = np.array([max_delay, max_delay, 4, 2, 1])[:n_periods]
-    # Delay distribution: geometric-ish
+    # Truncation: older periods have more observed delays
+    # Build dynamically to handle any n_periods
+    trunc_values = []
+    for i in range(n_periods):
+        elapsed = n_periods - 1 - i  # older periods have more elapsed time
+        trunc_values.append(min(max_delay, elapsed + 1))
+    truncation_depth = np.array(trunc_values, dtype=int)
+    # Ensure at least 1
+    truncation_depth = np.maximum(truncation_depth, 1)
+    # Delay distribution
     p_hat = rng.dirichlet(np.ones(max_delay), size=n_periods)
     observed = rng.integers(0, 10, size=(n_periods, max_delay)).astype(float)
     lambda_hat = rng.uniform(5, 20, size=n_periods)
