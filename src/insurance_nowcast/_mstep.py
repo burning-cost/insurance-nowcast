@@ -299,7 +299,6 @@ class MultinomialGLMDelay:
 
         self._n_classes = n_classes
         self._model = LogisticRegression(
-            multi_class="multinomial",
             solver="lbfgs",
             C=self.C,
             max_iter=self.max_iter,
