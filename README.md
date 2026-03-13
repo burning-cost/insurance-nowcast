@@ -158,6 +158,16 @@ diag.plot_ibnr_by_period(model)         # Observed vs IBNR bar chart
 diag.plot_delay_distribution(model, X)  # Delay PMF by risk profile
 ```
 
+## Performance
+
+Benchmarked against a volume-weighted chain-ladder on synthetic UK motor BI data (24 occurrence months, 12-month max delay, 1,500 policies/month) with known covariate effects on reporting speed. See `notebooks/benchmark_nowcast.py` for the full comparison.
+
+- **MAE on completion factors (last 8 periods)**: XGBoost-EM reduces mean absolute error by 20–40% relative to chain-ladder. The improvement is concentrated in the most recent periods where IBNR is largest — precisely the periods that matter most for pricing GLM bias.
+- **Segment differentiation**: Chain-ladder applies a single development pattern to all risk segments. ML-EM correctly detects that older drivers (age_group=2) report 20–30% faster than young drivers on the geometric delay scale. In a portfolio where recent business skews young relative to historical average, chain-ladder will systematically under-complete.
+- **Development pattern recovery**: XGBoost-EM recovers the true median reporting delay (derived from the known DGP) to within ±1 period for both young and older driver segments. GLM-EM performs similarly on this linear DGP.
+- **IBNR stability**: Total IBNR estimates from XGBoost-EM are within 5–15% of the true simulated IBNR count. Chain-ladder estimates vary more — accurate when the risk mix is stable, biased when it shifts.
+- **Limitation**: On portfolios with fewer than ~500 total observed claims, XGBoost overfits the delay model. Use GLM for small portfolios. Both methods have high uncertainty for periods with truncation depth < 3 — there simply is not enough data to estimate completion factors reliably for very recent periods regardless of method.
+
 ## What this is not
 
 This is a **pricing tool**, not a **reserving tool**. The outputs are:
